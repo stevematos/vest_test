@@ -1,0 +1,30 @@
+{
+  "data": {
+    "symbol": "AAPL",
+    "companyName": "Apple Inc. Common Stock",
+    "stockType": "Common Stock",
+    "exchange": "NASDAQ-GS",
+    "isNasdaqListed": true,
+    "isNasdaq100": true,
+    "isHeld": false,
+    "primaryData": {
+      "lastSalePrice": "$144.84",
+      "netChange": "+1.08",
+      "percentageChange": "+0.75%",
+      "deltaIndicator": "up",
+      "lastTradeTimestamp": "DATA AS OF Oct 15, 2021",
+      "isRealTime": false
+    },
+    "secondaryData": null,
+    "marketStatus": "Market Closed",
+    "assetClass": "STOCKS",
+    "tradingHeld": null,
+    "complianceStatus": null
+  },
+  "message": null,
+  "status": {
+    "rCode": 200,
+    "bCodeMessage": null,
+    "developerMessage": null
+  }
+}
