@@ -53,7 +53,17 @@ async def action_with_share(symbol: str, type_action: TypeAction, share: schemas
     share_total = schemas.ShareTotal(quantity=share_quantity,
                                      price_unit=price_unit,
                                      symbol_currency=symbol_currency)
-    db_share = crud.create_share(db, share_total, db_company.id)
 
-    # todo: Personalizar la respuesta
-    return db_share
+    crud.create_share(db, share_total, db_company.id)
+
+    result = {
+        'data': {
+            'quantity': share.quantity,
+            'price_unit': f'{symbol_currency}{price_unit}',
+            'type_action': type_action,
+            'company': db_company.name,
+            'symbol_company': symbol,
+        },
+        'message': 'Successful operation'
+    }
+    return result
