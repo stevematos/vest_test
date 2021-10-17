@@ -1,18 +1,20 @@
-from typing import List, Optional
-
 from pydantic import BaseModel
 
 
 class ShareBase(BaseModel):
     quantity: int
-    price_unit: float
 
 
-class ShareCreate(ShareBase):
+class ShareInput(ShareBase):
     pass
 
 
-class Share(ShareBase):
+class ShareTotal(ShareBase):
+    price_unit: float
+    symbol_currency: str
+
+
+class Share(ShareTotal):
     id: int
     company_id: int
 

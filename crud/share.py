@@ -4,7 +4,7 @@ import models
 import schemas
 
 
-def create_share(db: Session, share: schemas.ShareCreate, company_id: int):
+def create_share(db: Session, share: schemas.ShareTotal, company_id: int):
     db_share = models.Share(**share.dict(), company_id=company_id)
     db.add(db_share)
     db.commit()

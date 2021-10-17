@@ -1,2 +1,2 @@
-from .company import Company, CompanyCreate
-from .share import Share, ShareCreate
+from .company import Company, CompanyInput
+from .share import Share, ShareInput, ShareTotal
