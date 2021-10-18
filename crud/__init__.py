@@ -1,2 +1,2 @@
 from .company import get_company_or_create
-from .share import create_share
+from .share import create_share, get_share_all

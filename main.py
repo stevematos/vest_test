@@ -6,6 +6,7 @@ import crud
 import schemas
 from api import api
 from db import SessionLocal, engine, Base
+from schemas import ActionWithShareResponseModel
 from utils import split_symbol_and_number
 
 Base.metadata.create_all(bind=engine)
@@ -32,7 +33,8 @@ async def root():
     return {"status": "ready"}
 
 
-@app.post("/share/{symbol}/{type_action}")
+@app.post("/share/{symbol}/{type_action}",
+          response_model=ActionWithShareResponseModel)
 async def action_with_share(symbol: str, type_action: TypeAction, share: schemas.ShareInput,
                             db: Session = Depends(get_db)):
     response_data = api.get_data_for_symbol(symbol)
@@ -50,6 +52,7 @@ async def action_with_share(symbol: str, type_action: TypeAction, share: schemas
     if type_action == TypeAction.sell:
         share_quantity = share_quantity * -1
 
+    # todo: hacer la validacion de no vender mas acciones si no tiene acciones compradas.
     share_total = schemas.ShareTotal(quantity=share_quantity,
                                      price_unit=price_unit,
                                      symbol_currency=symbol_currency)
@@ -67,3 +70,12 @@ async def action_with_share(symbol: str, type_action: TypeAction, share: schemas
         'message': 'Successful operation'
     }
     return result
+
+#
+# @app.get("/shares")
+# async def list_share(db: Session = Depends(get_db)):
+#     shares = crud.get_share_all(db)
+#
+#     for share in shares:
+#         print(share)
+#     return shares

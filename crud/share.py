@@ -1,7 +1,12 @@
 from sqlalchemy.orm import Session
+from typing import List
 
 import models
 import schemas
+
+
+def get_share_all(db: Session) -> List[models.Share]:
+    return db.query(models.Share).filter().all()
 
 
 def create_share(db: Session, share: schemas.ShareTotal, company_id: int):

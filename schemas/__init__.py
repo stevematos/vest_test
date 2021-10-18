@@ -1,2 +1,2 @@
-from .company import Company, CompanyInput
-from .share import Share, ShareInput, ShareTotal
+from .models import Company, CompanyInput, Share, ShareInput, ShareTotal
+from .api import ActionWithShareResponseModel
