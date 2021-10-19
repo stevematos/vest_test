@@ -7,7 +7,7 @@ import schemas
 from api import api
 from db import SessionLocal, engine, Base
 from schemas import ActionWithShareResponseModel
-from utils import split_symbol_and_number
+from utils import split_symbol_and_number, get_change, average
 
 Base.metadata.create_all(bind=engine)
 
@@ -71,11 +71,61 @@ async def action_with_share(symbol: str, type_action: TypeAction, share: schemas
     }
     return result
 
-#
-# @app.get("/shares")
-# async def list_share(db: Session = Depends(get_db)):
-#     shares = crud.get_share_all(db)
-#
-#     for share in shares:
-#         print(share)
-#     return shares
+
+@app.get("/shares")
+async def list_share(db: Session = Depends(get_db)):
+    shares = crud.get_share_all(db)
+
+    total_share_company = {}
+    for share in shares:
+        if share.company.symbol not in total_share_company:
+            total_share_company[share.company.symbol] = {
+                'company_name': share.company.name,
+                'total_share': 0,
+                'quantity_share': 0,
+                'prices': []
+            }
+        total_share_company[share.company.symbol]['total_share'] += share.quantity * share.price_unit
+        total_share_company[share.company.symbol]['quantity_share'] += share.quantity
+        total_share_company[share.company.symbol]['prices'].append(share.price_unit)
+
+    symbols = total_share_company.keys()
+
+    # todo: se podria agregar los precios actuales a una tabla con un job
+    for symbol in symbols:
+        quantity_total = total_share_company[symbol]['quantity_share']
+        symbol_currency, price_share_now = split_symbol_and_number(
+            api.get_data_for_symbol(symbol)['data']['primaryData']['lastSalePrice'])
+        total_share_now = quantity_total * float(price_share_now)
+        total_share_company[symbol]['total_share_now'] = total_share_now
+
+        total_share_company[symbol]['profit_or_loss_percentage'] = get_change(total_share_now,
+                                                                              total_share_company[symbol][
+                                                                                  'total_share'])
+
+        total_share_company[symbol]['symbol_currency'] = symbol_currency
+
+        # Lowest Price , Highest Price, Average Price
+        price_sort = total_share_company[symbol].pop('prices')
+        price_sort.sort()
+
+        total_share_company[symbol].update({
+            'lowest_price': price_sort[0],
+            'highest_price': price_sort[-1],
+            'average_price': average(price_sort)
+        })
+
+    # Round values
+    values_round = ['total_share', 'total_share_now', 'profit_or_loss_percentage', 'average_price']
+    round_decimal = 2
+    for symbol in symbols:
+        for value in values_round:
+            total_share_company[symbol][value] = round(total_share_company[symbol][value], round_decimal)
+
+    return total_share_company
+
+
+# @app.get("/prices_history/{symbol}")
+# async def prices_history(symbol: str, db: Session = Depends(get_db)):
+#     print(symbol)
+#     return symbol

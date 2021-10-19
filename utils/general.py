@@ -11,9 +11,13 @@ def get_change(current, previous):
     if current == previous:
         return 0
     try:
-        return ((current - previous)/ previous) * 100.0
+        return ((current - previous) / previous) * 100.0
     except ZeroDivisionError:
         return float('inf')
 
-print(get_change(24, 30))
 
+# print(get_change(24, 30))
+
+
+def average(lst):
+    return sum(lst) / len(lst)
