@@ -1,0 +1,390 @@
+{
+	"info": {
+		"_postman_id": "d8469413-203f-41e2-b51b-bf73dd8240cd",
+		"name": "vest_test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "action_with_share",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"quantity\": 5\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/share/AAA/sell",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"share",
+						"AAA",
+						"sell"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "buy share",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/share/GOOG/buy",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"share",
+								"GOOG",
+								"buy"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "date",
+							"value": "Wed, 20 Oct 2021 11:58:18 GMT"
+						},
+						{
+							"key": "server",
+							"value": "uvicorn"
+						},
+						{
+							"key": "content-length",
+							"value": "172"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Successful operation\",\n    \"data\": {\n        \"quantity\": 3,\n        \"price_unit\": \"$2872.92\",\n        \"type_action\": \"buy\",\n        \"company\": \"Alphabet Inc. Class C Capital Stock\",\n        \"symbol_company\": \"GOOG\"\n    }\n}"
+				},
+				{
+					"name": "sell error",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/share/GOOG/sell",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"share",
+								"GOOG",
+								"sell"
+							]
+						}
+					},
+					"status": "Unprocessable Entity",
+					"code": 422,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "date",
+							"value": "Wed, 20 Oct 2021 13:45:05 GMT"
+						},
+						{
+							"key": "server",
+							"value": "uvicorn"
+						},
+						{
+							"key": "content-length",
+							"value": "54"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"detail\": \"It does not contain enough shares to sell\"\n}"
+				},
+				{
+					"name": "symbol not found",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/share/AAA/sell",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"share",
+								"AAA",
+								"sell"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "date",
+							"value": "Wed, 20 Oct 2021 13:45:28 GMT"
+						},
+						{
+							"key": "server",
+							"value": "uvicorn"
+						},
+						{
+							"key": "content-length",
+							"value": "29"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"detail\": \"Symbol not found\"\n}"
+				},
+				{
+					"name": "sell share",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/share/GOOG/sell",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"share",
+								"GOOG",
+								"sell"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "date",
+							"value": "Wed, 20 Oct 2021 13:44:11 GMT"
+						},
+						{
+							"key": "server",
+							"value": "uvicorn"
+						},
+						{
+							"key": "content-length",
+							"value": "131"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"quantity\": 1,\n    \"price_unit\": \"$2875.00\",\n    \"type_action\": \"sell\",\n    \"company\": \"Alphabet Inc. Class C Capital Stock\",\n    \"symbol_company\": \"GOOG\"\n}"
+				}
+			]
+		},
+		{
+			"name": "shares",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/shares",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"shares"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "list shares",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/shares",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"shares"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "date",
+							"value": "Wed, 20 Oct 2021 12:00:07 GMT"
+						},
+						{
+							"key": "server",
+							"value": "uvicorn"
+						},
+						{
+							"key": "content-length",
+							"value": "495"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"AAPL\": {\n        \"company_name\": \"Apple Inc. Common Stock\",\n        \"total_share\": 891.78,\n        \"quantity_share\": 6,\n        \"total_share_now\": 891.12,\n        \"profit_or_loss_percentage\": -0.07,\n        \"symbol_currency\": \"$\",\n        \"lowest_price\": 148.61,\n        \"highest_price\": 148.65,\n        \"average_price\": 148.63\n    },\n    \"GOOG\": {\n        \"company_name\": \"Alphabet Inc. Class C Capital Stock\",\n        \"total_share\": 8618.76,\n        \"quantity_share\": 3,\n        \"total_share_now\": 8639.59,\n        \"profit_or_loss_percentage\": 0.24,\n        \"symbol_currency\": \"$\",\n        \"lowest_price\": 2872.92,\n        \"highest_price\": 2872.92,\n        \"average_price\": 2872.92\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "prices_history",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/prices_history/APPL",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"prices_history",
+						"APPL"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "prices_history for AAPL",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/prices_history/AAPL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"prices_history",
+								"AAPL"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "date",
+							"value": "Wed, 20 Oct 2021 13:53:39 GMT"
+						},
+						{
+							"key": "server",
+							"value": "uvicorn"
+						},
+						{
+							"key": "content-length",
+							"value": "187"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"price_unit\": \"$148.52\",\n        \"create_date\": \"2021-10-20T12:00:05\"\n    },\n    {\n        \"price_unit\": \"$149.3199\",\n        \"create_date\": \"2021-10-20T13:00:05\"\n    },\n    {\n        \"price_unit\": \"$149.275\",\n        \"create_date\": \"2021-10-20T14:00:05\"\n    }\n]"
+				}
+			]
+		}
+	],
+	"protocolProfileBehavior": {}
+}
