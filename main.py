@@ -23,13 +23,13 @@ def get_db():
 
 
 @app.get("/status")
-async def root():
+async def status():
     return {"status": "ready"}
 
 
 @app.post("/share/{symbol}/{type_action}",
           response_model=schemas.ActionWithShareResponseModel)
-async def action_with_share(symbol: str, type_action: schemas.TypeAction, share: schemas.ShareInput,
+async def create_share(symbol: str, type_action: schemas.TypeAction, share: schemas.ShareInput,
                             db: Session = Depends(get_db)):
     # Extraction of information from the api
     response_data = api.get_data_for_symbol(symbol)
