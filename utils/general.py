@@ -16,8 +16,5 @@ def get_change(current, previous):
         return float('inf')
 
 
-# print(get_change(24, 30))
-
-
 def average(lst):
     return sum(lst) / len(lst)

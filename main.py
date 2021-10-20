@@ -6,16 +6,10 @@ import crud
 import schemas
 from api import api
 from db import SessionLocal, engine, Base
-from schemas import ActionWithShareResponseModel
+from schemas import ActionWithShareResponseModel, TypeAction
 from utils import split_symbol_and_number, get_change, average
 
 Base.metadata.create_all(bind=engine)
-
-
-class TypeAction(str, Enum):
-    buy = "buy"
-    sell = "sell"
-
 
 app = FastAPI()
 
@@ -47,15 +41,13 @@ async def action_with_share(symbol: str, type_action: TypeAction, share: schemas
     db_company = crud.get_company_or_create(db, company)
 
     symbol_currency, price_unit = split_symbol_and_number(data['primaryData']['lastSalePrice'])
-    share_quantity = share.quantity
-
-    if type_action == TypeAction.sell:
-        share_quantity = share_quantity * -1
 
     # todo: hacer la validacion de no vender mas acciones si no tiene acciones compradas.
-    share_total = schemas.ShareTotal(quantity=share_quantity,
+
+    share_total = schemas.ShareTotal(quantity=share.quantity,
                                      price_unit=price_unit,
-                                     symbol_currency=symbol_currency)
+                                     symbol_currency=symbol_currency,
+                                     type_action=type_action)
 
     crud.create_share(db, share_total, db_company.id)
 
@@ -78,20 +70,23 @@ async def list_share(db: Session = Depends(get_db)):
 
     total_share_company = {}
     for share in shares:
-        if share.company.symbol not in total_share_company:
-            total_share_company[share.company.symbol] = {
+        symbol = share.company.symbol
+        if symbol not in total_share_company:
+            total_share_company[symbol] = {
                 'company_name': share.company.name,
                 'total_share': 0,
                 'quantity_share': 0,
                 'prices': []
             }
-        total_share_company[share.company.symbol]['total_share'] += share.quantity * share.price_unit
-        total_share_company[share.company.symbol]['quantity_share'] += share.quantity
-        total_share_company[share.company.symbol]['prices'].append(share.price_unit)
+
+        multiplier = -1 if share.type_action == TypeAction.sell else 1
+
+        total_share_company[symbol]['total_share'] += share.quantity * share.price_unit * multiplier
+        total_share_company[symbol]['quantity_share'] += share.quantity * multiplier
+        total_share_company[symbol]['prices'].append(share.price_unit)
 
     symbols = total_share_company.keys()
 
-    # todo: se podria agregar los precios actuales a una tabla con un job
     for symbol in symbols:
         quantity_total = total_share_company[symbol]['quantity_share']
         symbol_currency, price_share_now = split_symbol_and_number(
@@ -125,7 +120,8 @@ async def list_share(db: Session = Depends(get_db)):
     return total_share_company
 
 
-# @app.get("/prices_history/{symbol}")
-# async def prices_history(symbol: str, db: Session = Depends(get_db)):
-#     print(symbol)
-#     return symbol
+# Todo: agregar scheduler
+@app.get("/prices_history/{symbol}")
+async def prices_history(symbol: str, db: Session = Depends(get_db)):
+    print(symbol)
+    return symbol

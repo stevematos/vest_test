@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from schemas.general import TypeAction
 
 
 class ShareBase(BaseModel):
@@ -12,6 +13,7 @@ class ShareInput(ShareBase):
 class ShareTotal(ShareBase):
     price_unit: float
     symbol_currency: str
+    type_action: TypeAction
 
 
 class Share(ShareTotal):

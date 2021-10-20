@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from typing import Dict
+from schemas.general import TypeAction
 
 
 class ActionWithShare(BaseModel):
     quantity: int
     price_unit: str
-    type_action: str
+    type_action: TypeAction
     company: str
     symbol_company: str
 
