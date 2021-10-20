@@ -61,6 +61,8 @@ VEST_TEST
 └───test: contains the application tests
 │   
 └───utils: functions that are reused in the application
+│   
+└───postman: application documentation, import the json into the postman to see the different endpoints and their examples.
 ```
 
 Developed by: [Steve Matos](https://github.com/stevematos)
