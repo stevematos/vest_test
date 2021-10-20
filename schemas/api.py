@@ -1,8 +1,9 @@
 from pydantic import BaseModel
 from schemas.general import TypeAction
+from datetime import datetime
 
 
-class ActionWithShare(BaseModel):
+class ActionWithShareResponseModel(BaseModel):
     quantity: int
     price_unit: str
     type_action: TypeAction
@@ -10,10 +11,7 @@ class ActionWithShare(BaseModel):
     symbol_company: str
 
 
-class ResponseModelBase(BaseModel):
-    message: str
-    data: BaseModel
 
-
-class ActionWithShareResponseModel(ResponseModelBase):
-    data: ActionWithShare
+class PricesHistoryBySymbolResponseModel(BaseModel):
+    price_unit: str
+    create_date: datetime

@@ -1,13 +1,13 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from enum import Enum
+from typing import List
 
 import crud
 import schemas
 from api import api
-from db import SessionLocal, engine, Base
-from schemas import ActionWithShareResponseModel, TypeAction
+from db import SessionLocal, engine, Base, SessionMarkerFastAPI
 from utils import split_symbol_and_number, get_change, average
+from fastapi_utils.tasks import repeat_every
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,38 +28,41 @@ async def root():
 
 
 @app.post("/share/{symbol}/{type_action}",
-          response_model=ActionWithShareResponseModel)
-async def action_with_share(symbol: str, type_action: TypeAction, share: schemas.ShareInput,
+          response_model=schemas.ActionWithShareResponseModel)
+async def action_with_share(symbol: str, type_action: schemas.TypeAction, share: schemas.ShareInput,
                             db: Session = Depends(get_db)):
+    # Extraction of information from the api
     response_data = api.get_data_for_symbol(symbol)
+
+    # Validate if the symbol exists
     if response_data['status']['rCode'] == 400:
         error = 'Symbol not found'
         raise HTTPException(status_code=404, detail=error)
+
     data = response_data['data']
 
+    # Create Company if not exist
     company = schemas.CompanyInput(name=data['companyName'], symbol=data['symbol'])
     db_company = crud.get_company_or_create(db, company)
 
+    # Create Share
     symbol_currency, price_unit = split_symbol_and_number(data['primaryData']['lastSalePrice'])
-
-    # todo: hacer la validacion de no vender mas acciones si no tiene acciones compradas.
-
     share_total = schemas.ShareTotal(quantity=share.quantity,
                                      price_unit=price_unit,
                                      symbol_currency=symbol_currency,
                                      type_action=type_action)
+    share_create = crud.create_share(db, share_total, db_company.id)
 
-    crud.create_share(db, share_total, db_company.id)
-
+    # Validation sell
+    if share_create is None:
+        error = 'It does not contain enough shares to sell'
+        raise HTTPException(status_code=422, detail=error)
     result = {
-        'data': {
-            'quantity': share.quantity,
-            'price_unit': f'{symbol_currency}{price_unit}',
-            'type_action': type_action,
-            'company': db_company.name,
-            'symbol_company': symbol,
-        },
-        'message': 'Successful operation'
+        'quantity': share.quantity,
+        'price_unit': f'{symbol_currency}{price_unit}',
+        'type_action': type_action,
+        'company': db_company.name,
+        'symbol_company': symbol,
     }
     return result
 
@@ -79,7 +82,7 @@ async def list_share(db: Session = Depends(get_db)):
                 'prices': []
             }
 
-        multiplier = -1 if share.type_action == TypeAction.sell else 1
+        multiplier = -1 if share.type_action == schemas.TypeAction.sell else 1
 
         total_share_company[symbol]['total_share'] += share.quantity * share.price_unit * multiplier
         total_share_company[symbol]['quantity_share'] += share.quantity * multiplier
@@ -120,8 +123,35 @@ async def list_share(db: Session = Depends(get_db)):
     return total_share_company
 
 
-# Todo: agregar scheduler
-@app.get("/prices_history/{symbol}")
-async def prices_history(symbol: str, db: Session = Depends(get_db)):
-    print(symbol)
-    return symbol
+# Scheduler with interval 1 hour
+@app.on_event("startup")
+@repeat_every(seconds=60 * 60)
+def history_prices_for_symbol() -> None:
+    try:
+        with SessionMarkerFastAPI.context_session() as db:
+            companies = crud.get_company_all(db)
+            for company in companies:
+                response_data = api.get_data_for_symbol(company.symbol)
+
+                data = response_data['data']
+                symbol_currency, price_unit = split_symbol_and_number(data['primaryData']['lastSalePrice'])
+                price_history_total = schemas.PriceHistoryTotal(price_unit=price_unit,
+                                                                symbol_currency=symbol_currency)
+                crud.create_price_history(db, price_history_total, company.id)
+
+    except Exception as err:
+        print(err)
+
+
+@app.get("/prices_history/{symbol}",
+         response_model=List[schemas.PricesHistoryBySymbolResponseModel])
+async def prices_history_by_symbol(symbol: str, db: Session = Depends(get_db)):
+    prices_history = crud.get_price_history_by_symbol(db, symbol)
+
+    result = []
+    for price_history in prices_history:
+        result.append({
+            'price_unit': f'{price_history.symbol_currency}{price_history.price_unit}',
+            'create_date': price_history.create_date
+        })
+    return result

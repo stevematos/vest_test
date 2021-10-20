@@ -1,7 +1,12 @@
 from sqlalchemy.orm import Session
+from typing import List
 
 import models
 import schemas
+
+
+def get_company_all(db: Session) -> List[models.Company]:
+    return db.query(models.Company).filter().all()
 
 
 def get_company_by_symbol(db: Session, symbol: str):
